@@ -1,0 +1,45 @@
+model:
+  base_learning_rate: 4.5e-06
+  target: ldm.models.autoencoder.AutoencoderKL
+  params:
+    monitor: val/rec_loss
+    embed_dim: 4
+    lossconfig:
+      target: ldm.modules.losses.LPIPSWithDiscriminator
+      params:
+        disc_start: 50001
+        kl_weight: 1.0e-06
+        disc_weight: 0.5
+    ddconfig:
+      double_z: true
+      z_channels: 4
+      resolution: 256
+      in_channels: 3
+      out_ch: 3
+      ch: 128
+      ch_mult:
+      - 1
+      - 2
+      - 4
+      - 4
+      num_res_blocks: 2
+      attn_resolutions: []
+      dropout: 0.0
+      add_gray: true
+      adapter: true
+      tune_last_layer: false
+data:
+  target: main.DataModuleFromConfig
+  params:
+    batch_size: 4
+    wrap: true
+    train:
+      target: ldm.data.imagenet.ImageNetTrain
+      params:
+        size: 256
+        random_crop: true
+    validation:
+      target: ldm.data.imagenet.ImageNetValidation
+      params:
+        size: 256
+        random_crop: true
